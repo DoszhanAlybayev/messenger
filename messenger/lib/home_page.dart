@@ -1,5 +1,6 @@
 // lib/home_page.dart
 import 'package:flutter/material.dart';
+import 'package:messenger/screens/chat_list_screen.dart'; // Импортируем новый экран
 import 'package:messenger/screens/settings_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,16 +13,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // Список виджетов, которые будут отображаться в центральной части
-  static final List<Widget> _widgetOptions = <Widget>[
-    // Здесь мы показываем, что чатов пока нет
-    const Center(
-      child: Text(
-        'У вас пока нет переписок',
-        style: TextStyle(fontSize: 18, color: Colors.grey),
-      ),
-    ),
-    const Center(child: Text('Поиск пользователей')),
+  static const List<Widget> _widgetOptions = <Widget>[
+    // Теперь здесь наш полноценный экран списка чатов
+    ChatListScreen(),
+    // Заглушка для поиска пользователей
+    Center(child: Text('Поиск пользователей')),
+    // Экран настроек
     SettingsScreen(), 
   ];
 
@@ -34,15 +31,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // --- Верхний навбар ---
       appBar: AppBar(
         title: const Text('Мессенджер'),
       ),
-      
-      // --- Центральная часть (содержимое) ---
       body: _widgetOptions.elementAt(_selectedIndex),
-      
-      // --- Нижний навбар ---
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
