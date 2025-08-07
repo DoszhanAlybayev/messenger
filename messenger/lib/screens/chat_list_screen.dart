@@ -25,7 +25,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     Chat(
       id: '2',
       name: 'Иван',
-      lastMessage: 'Уже закончил работу?',
+      lastMessage: null, // Теперь может быть null
       avatarUrl: 'https://via.placeholder.com/150',
       lastMessageTimestamp: DateTime.now().subtract(const Duration(hours: 2)),
       unreadCount: 0,
@@ -131,7 +131,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               backgroundImage: NetworkImage(chat.avatarUrl),
             ),
             title: Text(chat.name),
-            subtitle: Text(chat.lastMessage),
+            subtitle: Text(chat.lastMessage ?? 'Начните беседу'),
             trailing: trailingWidget,
             onTap: () => _onChatTapped(chat),
           );

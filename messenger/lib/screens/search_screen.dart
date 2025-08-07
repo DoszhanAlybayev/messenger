@@ -1,8 +1,8 @@
 // lib/screens/search_screen.dart
 import 'package:flutter/material.dart';
-import 'package:messenger/models/chat.dart'; // Импортируем модель Chat
+import 'package:messenger/models/chat.dart';
 import 'package:messenger/models/user.dart';
-import 'package:messenger/screens/chat_screen.dart'; // Импортируем ChatScreen
+import 'package:messenger/screens/chat_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -15,7 +15,6 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<User> _foundUsers = [];
 
-  // Статический список пользователей для имитации данных
   final List<User> _allUsers = const [
     User(id: 'u1', name: 'Анна', avatarUrl: 'https://via.placeholder.com/150'),
     User(id: 'u2', name: 'Иван', avatarUrl: 'https://via.placeholder.com/150'),
@@ -71,16 +70,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   title: Text(user.name),
                   onTap: () {
-                    // Создаём новый объект Chat из данных пользователя
                     final newChat = Chat(
                       id: user.id,
                       name: user.name,
                       avatarUrl: user.avatarUrl,
-                      lastMessage: 'Начните беседу!', // Текст по умолчанию для нового чата
                       lastMessageTimestamp: DateTime.now(),
                       unreadCount: 0,
                     );
-                    // Переходим на экран чата
                     Navigator.push(
                       context,
                       MaterialPageRoute(

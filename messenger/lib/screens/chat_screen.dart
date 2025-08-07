@@ -35,7 +35,10 @@ class _ChatViewState extends State<ChatView> {
   @override
   void initState() {
     super.initState();
-    context.read<ChatBloc>().add(LoadMessages());
+    // Загружаем сообщения, только если у чата есть последнее сообщение
+    if (widget.chat.lastMessage != null) {
+      context.read<ChatBloc>().add(LoadMessages());
+    }
   }
 
   @override
@@ -53,12 +56,11 @@ class _ChatViewState extends State<ChatView> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // Отключаем автоматический pop
+      canPop: false,
       onPopInvoked: (bool didPop) {
         if (didPop) {
           return;
         }
-        // Передаем последнее сообщение обратно
         Navigator.pop(context, _textController.text);
       },
       child: Scaffold(
@@ -79,6 +81,17 @@ class _ChatViewState extends State<ChatView> {
             Expanded(
               child: BlocBuilder<ChatBloc, ChatState>(
                 builder: (context, state) {
+                  // Если состояние начальное ИЛИ чат загружен, но сообщений нет
+                  if (state is ChatInitial || (state is ChatLoaded && state.messages.isEmpty)) {
+                    return const Center(
+                      child: Text(
+                        'Отправьте свое первое сообщение',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    );
+                  }
+                  
+                  // Если сообщения загружены (и список не пустой), показываем их
                   if (state is ChatLoaded) {
                     return ListView.builder(
                       reverse: true,
@@ -96,6 +109,8 @@ class _ChatViewState extends State<ChatView> {
                       },
                     );
                   }
+                  
+                  // В остальных случаях (когда идет загрузка), показываем индикатор
                   return const Center(child: CircularProgressIndicator());
                 },
               ),
