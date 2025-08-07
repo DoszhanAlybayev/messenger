@@ -1,7 +1,9 @@
+// lib/screens/settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Импортируем пакет
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:messenger/widgets/profile_avatar.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -21,7 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadProfileData(); // Загружаем сохраненные данные при инициализации
+    _loadProfileData();
   }
 
   @override
@@ -31,18 +33,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  // Метод для загрузки данных из SharedPreferences
   Future<void> _loadProfileData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     
     setState(() {
-      // Загружаем имя, если оно есть, иначе используем значение по умолчанию
       _nameController.text = prefs.getString('user_name') ?? 'Иван Иванов';
-      
-      // Загружаем "о себе", если оно есть
       _aboutController.text = prefs.getString('user_about') ?? 'Привет, я новый пользователь мессенджера!';
       
-      // Загружаем путь к аватарке, если он есть
       final String? imagePath = prefs.getString('user_avatar_path');
       if (imagePath != null) {
         _image = File(imagePath);
@@ -50,7 +47,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  // Метод для сохранения данных в SharedPreferences
   Future<void> _saveProfile() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -90,36 +86,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: _image != null
-                          ? FileImage(_image!) as ImageProvider
-                          : const NetworkImage('https://via.placeholder.com/150'),
-                    ),
-                    if (_isEditing)
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: _pickImage,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+              // Используем наш новый виджет ProfileAvatar
+              ProfileAvatar(
+                image: _image,
+                isEditing: _isEditing,
+                onAddImagePressed: _pickImage,
               ),
+
               const SizedBox(height: 16),
               
               TextButton(
