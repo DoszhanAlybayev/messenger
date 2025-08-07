@@ -5,13 +5,15 @@ class Chat {
   final String name;
   final String lastMessage;
   final String avatarUrl;
-  final DateTime lastMessageTimestamp; // Добавляем новое поле для времени
+  final DateTime lastMessageTimestamp;
+  final int unreadCount; 
 
   const Chat({
     required this.id,
     required this.name,
     required this.lastMessage,
     required this.avatarUrl,
-    required this.lastMessageTimestamp, // Обновляем конструктор
+    required this.lastMessageTimestamp,
+    this.unreadCount = 0, 
   });
 }
