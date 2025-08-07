@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'dart:io';
 import 'package:messenger/widgets/profile_avatar.dart';
+import 'package:messenger/providers/theme_provider.dart'; // Импортируем провайдер темы
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -55,10 +57,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await prefs.setString('user_avatar_path', _image!.path);
     }
     
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Профиль сохранен!')),
-    );
-    _toggleEditing();
+    // Показываем Snackbar в Scaffold
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Профиль сохранен!')),
+      );
+      _toggleEditing();
+    }
   }
 
   void _toggleEditing() {
@@ -78,6 +83,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Получаем доступ к ThemeProvider
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.themeMode == ThemeMode.dark;
+    
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -93,7 +102,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               
               const SizedBox(height: 32),
               
-              // --- Условное отображение полей ---
               if (_isEditing) ...[
                 TextField(
                   controller: _nameController,
@@ -118,7 +126,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ] else ...[
-                // Отображаем имя и "О себе" как обычный текст
                 Text(
                   _nameController.text,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -131,10 +138,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   textAlign: TextAlign.center,
                 ),
               ],
-              
-              const SizedBox(height: 32),
 
-              // --- Кнопка "Редактировать профиль" или "Отменить" ---
+              
               TextButton(
                 onPressed: _toggleEditing,
                 child: Text(
@@ -145,7 +150,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 16),
               
-              // --- Кнопка "Сохранить" ---
               if (_isEditing)
                 ElevatedButton(
                   onPressed: _saveProfile,
@@ -154,6 +158,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               
               if (_isEditing)
                 const SizedBox(height: 16),
+
+                              // --- Переключатель для темной темы ---
+              SwitchListTile(
+                title: const Text('Темная тема'),
+                value: isDark,
+                onChanged: (bool value) {
+                  themeProvider.toggleTheme(value);
+                },
+                secondary: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+              ),
+
+              const SizedBox(height: 250),
               
               ElevatedButton(
                 onPressed: () {},
