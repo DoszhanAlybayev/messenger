@@ -49,7 +49,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _saveProfile() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
     await prefs.setString('user_name', _nameController.text);
     await prefs.setString('user_about', _aboutController.text);
     if (_image != null) {
@@ -86,15 +85,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Используем наш новый виджет ProfileAvatar
               ProfileAvatar(
                 image: _image,
                 isEditing: _isEditing,
                 onAddImagePressed: _pickImage,
               ),
-
-              const SizedBox(height: 16),
               
+              const SizedBox(height: 32),
+              
+              // --- Условное отображение полей ---
+              if (_isEditing) ...[
+                TextField(
+                  controller: _nameController,
+                  enabled: _isEditing,
+                  decoration: InputDecoration(
+                    labelText: 'Имя',
+                    border: const OutlineInputBorder(),
+                    filled: !_isEditing,
+                    fillColor: Colors.grey[200],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _aboutController,
+                  maxLines: 3,
+                  enabled: _isEditing,
+                  decoration: InputDecoration(
+                    labelText: 'О себе',
+                    border: const OutlineInputBorder(),
+                    filled: !_isEditing,
+                    fillColor: Colors.grey[200],
+                  ),
+                ),
+              ] else ...[
+                // Отображаем имя и "О себе" как обычный текст
+                Text(
+                  _nameController.text,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _aboutController.text,
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              
+              const SizedBox(height: 32),
+
+              // --- Кнопка "Редактировать профиль" или "Отменить" ---
               TextButton(
                 onPressed: _toggleEditing,
                 child: Text(
@@ -102,34 +142,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: const TextStyle(color: Colors.blue),
                 ),
               ),
-              
-              const SizedBox(height: 32),
-              
-              TextField(
-                controller: _nameController,
-                enabled: _isEditing,
-                decoration: InputDecoration(
-                  labelText: 'Имя',
-                  border: const OutlineInputBorder(),
-                  filled: !_isEditing,
-                  fillColor: Colors.grey[200],
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _aboutController,
-                maxLines: 3,
-                enabled: _isEditing,
-                decoration: InputDecoration(
-                  labelText: 'О себе',
-                  border: const OutlineInputBorder(),
-                  filled: !_isEditing,
-                  fillColor: Colors.grey[200],
-                ),
-              ),
-              
-              const SizedBox(height: 32),
 
+              const SizedBox(height: 16),
+              
+              // --- Кнопка "Сохранить" ---
               if (_isEditing)
                 ElevatedButton(
                   onPressed: _saveProfile,
