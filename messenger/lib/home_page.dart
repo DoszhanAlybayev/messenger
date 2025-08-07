@@ -1,5 +1,6 @@
 // lib/home_page.dart
 import 'package:flutter/material.dart';
+import 'package:messenger/screens/settings_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,15 +10,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // Индекс выбранного пункта в навигационной панели
+  int _selectedIndex = 0;
 
-  // Список виджетов, которые будут отображаться по центру
+  // Список виджетов, которые будут отображаться в центральной части
   static final List<Widget> _widgetOptions = <Widget>[
-    // Здесь мы пока будем просто отображать заглушки
-    // Позже мы заменим их на реальные экраны
-    const Center(child: Text('Переписки (Чаты)')),
+    // Здесь мы показываем, что чатов пока нет
+    const Center(
+      child: Text(
+        'У вас пока нет переписок',
+        style: TextStyle(fontSize: 18, color: Colors.grey),
+      ),
+    ),
     const Center(child: Text('Поиск пользователей')),
-    const Center(child: Text('Настройки')),
+    SettingsScreen(), 
   ];
 
   void _onItemTapped(int index) {
