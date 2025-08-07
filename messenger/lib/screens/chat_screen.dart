@@ -1,11 +1,12 @@
 // lib/screens/chat_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart'; 
 import 'package:messenger/models/chat.dart';
 import 'package:messenger/bloc/chat_bloc.dart';
 import 'package:messenger/bloc/chat_event.dart';
 import 'package:messenger/bloc/chat_state.dart';
-import 'package:messenger/widgets/message_bubble.dart'; // Импорт нового виджета
+import 'package:messenger/widgets/message_bubble.dart'; 
 
 class ChatScreen extends StatelessWidget {
   final Chat chat;
@@ -34,8 +35,13 @@ class _ChatViewState extends State<ChatView> {
   @override
   void initState() {
     super.initState();
-    // Отправляем событие загрузки при инициализации
     context.read<ChatBloc>().add(LoadMessages());
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
   }
 
   void _handleSubmitted(String text) {
@@ -66,14 +72,17 @@ class _ChatViewState extends State<ChatView> {
               builder: (context, state) {
                 if (state is ChatLoaded) {
                   return ListView.builder(
-                    reverse: true, // Чтобы сообщения были снизу вверх
+                    reverse: true,
                     itemCount: state.messages.length,
                     itemBuilder: (context, index) {
                       final message = state.messages[state.messages.length - 1 - index];
                       final isMe = message.sender == 'Я';
+                      final formattedTime = DateFormat('HH:mm').format(message.timestamp);
+
                       return MessageBubble(
                         text: message.text,
                         isMe: isMe,
+                        time: formattedTime,
                       );
                     },
                   );
@@ -93,7 +102,7 @@ class _ChatViewState extends State<ChatView> {
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0), // Делаем контейнер круглым
+        borderRadius: BorderRadius.circular(25.0),
         boxShadow: [
           BoxShadow(
             offset: const Offset(0, 1),
@@ -105,19 +114,19 @@ class _ChatViewState extends State<ChatView> {
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: Row(
         children: [
-          const SizedBox(width: 8.0), // Небольшой отступ слева от текста
+          const SizedBox(width: 8.0),
           Expanded(
             child: TextField(
               controller: controller,
               onSubmitted: onSubmitted,
               decoration: const InputDecoration(
-                border: InputBorder.none, // Убираем стандартную границу TextField
+                border: InputBorder.none,
                 hintText: 'Сообщение',
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.send, color: Colors.blue), // Можно добавить цвет иконке
+            icon: const Icon(Icons.send, color: Colors.blue),
             onPressed: () => onSubmitted(controller.text),
           ),
         ],
