@@ -1,3 +1,4 @@
+// lib/bloc/chat/chat_state.dart
 import 'package:equatable/equatable.dart';
 import 'package:messenger/models/message.dart';
 
@@ -7,8 +8,10 @@ abstract class ChatState extends Equatable {
   List<Object> get props => [];
 }
 
+// Начальное состояние
 class ChatInitial extends ChatState {}
 
+// Состояние с загруженными сообщениями
 class ChatLoaded extends ChatState {
   final List<Message> messages;
   const ChatLoaded(this.messages);

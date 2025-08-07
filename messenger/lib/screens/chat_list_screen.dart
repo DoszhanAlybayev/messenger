@@ -1,6 +1,7 @@
 // lib/screens/chat_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:messenger/models/chat.dart'; 
+import 'package:messenger/screens/chat_screen.dart'; // Добавил этот импорт
 
 class ChatListScreen extends StatelessWidget {
   const ChatListScreen({super.key});
@@ -41,11 +42,14 @@ class ChatListScreen extends StatelessWidget {
             title: Text(chat.name),
             subtitle: Text(chat.lastMessage),
             onTap: () {
-              // Здесь будет навигация на экран чата
-              // Пока просто покажем сообщение
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Переход в чат с ${chat.name}...')),
+              // --- ИСПРАВЛЕНО: Реальная навигация на ChatScreen ---
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(chat: chat),
+                ),
               );
+              // ----------------------------------------------------
             },
           );
         },
