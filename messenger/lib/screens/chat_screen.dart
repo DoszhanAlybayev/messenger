@@ -52,47 +52,57 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
+    return PopScope(
+      canPop: false, // Отключаем автоматический pop
+      onPopInvoked: (bool didPop) {
+        if (didPop) {
+          return;
+        }
+        // Передаем последнее сообщение обратно
+        Navigator.pop(context, _textController.text);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(widget.chat.avatarUrl),
+                radius: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(widget.chat.name),
+            ],
+          ),
+        ),
+        body: Column(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(widget.chat.avatarUrl),
-              radius: 16,
+            Expanded(
+              child: BlocBuilder<ChatBloc, ChatState>(
+                builder: (context, state) {
+                  if (state is ChatLoaded) {
+                    return ListView.builder(
+                      reverse: true,
+                      itemCount: state.messages.length,
+                      itemBuilder: (context, index) {
+                        final message = state.messages[state.messages.length - 1 - index];
+                        final isMe = message.sender == 'Я';
+                        final formattedTime = DateFormat('HH:mm').format(message.timestamp);
+
+                        return MessageBubble(
+                          text: message.text,
+                          isMe: isMe,
+                          time: formattedTime,
+                        );
+                      },
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
             ),
-            const SizedBox(width: 8),
-            Text(widget.chat.name),
+            _buildTextComposer(_textController, _handleSubmitted),
           ],
         ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: BlocBuilder<ChatBloc, ChatState>(
-              builder: (context, state) {
-                if (state is ChatLoaded) {
-                  return ListView.builder(
-                    reverse: true,
-                    itemCount: state.messages.length,
-                    itemBuilder: (context, index) {
-                      final message = state.messages[state.messages.length - 1 - index];
-                      final isMe = message.sender == 'Я';
-                      final formattedTime = DateFormat('HH:mm').format(message.timestamp);
-
-                      return MessageBubble(
-                        text: message.text,
-                        isMe: isMe,
-                        time: formattedTime,
-                      );
-                    },
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
-          ),
-          _buildTextComposer(_textController, _handleSubmitted),
-        ],
       ),
     );
   }

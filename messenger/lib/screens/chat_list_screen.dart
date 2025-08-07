@@ -4,9 +4,15 @@ import 'package:intl/intl.dart';
 import 'package:messenger/models/chat.dart';
 import 'package:messenger/screens/chat_screen.dart';
 
-class ChatListScreen extends StatelessWidget {
-  ChatListScreen({super.key});
+class ChatListScreen extends StatefulWidget {
+  const ChatListScreen({super.key});
 
+  @override
+  State<ChatListScreen> createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
+  // Переносим список в State, чтобы его можно было изменять
   final List<Chat> _dummyChats = [
     Chat(
       id: '1',
@@ -34,6 +40,7 @@ class ChatListScreen extends StatelessWidget {
     ),
   ];
 
+  // Функция для динамического форматирования времени
   String _formatChatTime(DateTime timestamp) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -47,6 +54,38 @@ class ChatListScreen extends StatelessWidget {
       return 'Вчера';
     } else {
       return DateFormat('dd/MM/yy').format(timestamp);
+    }
+  }
+
+  // Обновляем onTap для работы с асинхронной навигацией
+  void _onChatTapped(Chat chat) async {
+    // Находим индекс текущего чата
+    final chatIndex = _dummyChats.indexWhere((c) => c.id == chat.id);
+
+    // Сбрасываем счетчик и обновляем состояние, чтобы UI изменился сразу
+    if (chatIndex != -1) {
+      setState(() {
+        _dummyChats[chatIndex] = _dummyChats[chatIndex].copyWith(unreadCount: 0);
+      });
+    }
+
+    // Переходим на экран чата и ждём результат
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(chat: _dummyChats[chatIndex]),
+      ),
+    );
+
+    // Если мы получили результат из ChatScreen
+    if (result != null) {
+      setState(() {
+        final lastMessage = result as String; // Предположим, что мы передали последнее сообщение
+        _dummyChats[chatIndex] = _dummyChats[chatIndex].copyWith(
+          lastMessage: lastMessage,
+          lastMessageTimestamp: DateTime.now(),
+        );
+      });
     }
   }
 
@@ -94,14 +133,7 @@ class ChatListScreen extends StatelessWidget {
             title: Text(chat.name),
             subtitle: Text(chat.lastMessage),
             trailing: trailingWidget,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(chat: chat),
-                ),
-              );
-            },
+            onTap: () => _onChatTapped(chat),
           );
         },
       ),
